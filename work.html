@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="Airport" content="Web site created" />
+		<!-- <link href="{% static 'landtime/style.css' %}" rel="stylesheet"> -->
+		<title>Airport Status</title>
+		<!-- <script src="./js.js"></script> -->
+		<style>
+			body {
+				background: white;
+				margin: 0;
+				padding: 0;
+				top: 0;
+				width: 100vw;
+			}
+			.todayIs {
+				background: black;
+				padding: 20px;
+			}
+			.todayIs a {
+				text-decoration: none;
+			}
+			.todaytitle {
+				color: white;
+			}
+			.dateOfToday {
+				color: white;
+			}
+			.teamSchedule,
+			.apc,
+			.onshift,
+			.other-team {
+				display: flex;
+				justify-content: center;
+				padding: 10px;
+			}
+			/* textarea {
+				border-radius: 10px;
+				padding: 10px;
+				border: none;
+				overflow: hidden;
+			} */
+
+			footer {
+				position: absolute;
+				bottom: 0px;
+				width: 100%;
+				background: black;
+				color: white;
+				text-align: end;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="wrapper">
+			<div class="todayIs">
+				<a href="#"><h1 class="todaytitle">Today is</h1></a>
+				<h3 id="dateOfToday" class="dateOfToday"></h3>
+			</div>
+
+			<div class="teamSchedule">
+				<input type="date" id="teamDateQ" placeholder="YYYY-MM-DD" />
+				<button id="btn-teamDateQ" class="btn-teamDateQ">Check Schedule</button>
+			</div>
+
+			<div class="team">
+				<div class="apc">
+					<textarea id="today-duty" rows="4" cols="30"></textarea>
+				</div>
+				<div class="onshift">
+					<textarea id="onshift-duty" rows="2" cols="30"></textarea>
+				</div>
+				<div class="other-team">
+					<textarea id="today-other-duty" rows="4" cols="30">A</textarea>
+				</div>
+			</div>
+
+			<!-- Bookmark -->
+			<div id="bookmarked" class="bookmarked">
+				<!-- <button id="add-person">Add Person</button> -->
+				<!-- TODO -->
+			</div>
+		</div>
+		<footer>326</footer>
+	</body>
+	<script>
+		const teams = {
+			SS: {
+				SS1: ["A", "P", "P", "N", "N", "F", "F", "A"],
+				SS2: ["P", "N", "N", "F", "F", "A", "A", "P"],
+				SS3: ["N", "F", "F", "A", "A", "P", "P", "N"],
+				SS4: ["F", "A", "A", "P", "P", "N", "N", "F"],
+			},
+			TT: {
+				TT1: ["F", "F", "A", "A", "P", "P", "N", "N"],
+				TT2: ["A", "A", "P", "P", "N", "N", "F", "F"],
+				TT3: ["P", "P", "N", "N", "F", "F", "A", "A"],
+				TT4: ["N", "N", "F", "F", "A", "A", "P", "P"],
+			},
+			AP: {
+				AP1: ["F", "F", "A", "A", "P", "P", "N", "N"],
+				AP2: ["A", "A", "P", "P", "N", "N", "F", "F"],
+				AP3: ["N", "N", "F", "F", "A", "A", "P", "P"],
+				AP4: ["P", "P", "N", "N", "F", "F", "A", "A"],
+			},
+			DO: {
+				DO1: ["N", "F", "F", "A", "A", "P", "P", "N"],
+				DO2: ["P", "N", "N", "F", "F", "A", "A", "P"],
+				DO3: ["A", "P", "P", "N", "N", "F", "F", "A"],
+				DO4: ["F", "A", "A", "P", "P", "N", "N", "F"],
+			},
+			AC: {
+				AC1: ["A", "A", "P", "P", "N", "N", "F", "F"],
+				AC2: ["P", "P", "N", "N", "F", "F", "A", "A"],
+				AC3: ["N", "N", "F", "F", "A", "A", "P", "P"],
+				AC4: ["F", "F", "A", "A", "P", "P", "N", "N"],
+			},
+		};
+
+		function scheduleCheck(dateIndex, teams) {
+			// const teamsLength = Object.keys(teams).length;
+			const amTeamJar = [];
+			const pmTeamJar = [];
+			const onTeamJar = [];
+
+			function inputToShiftArray(teamDiv, teamName, dateIndex) {
+				let checkTeam = teams[teamDiv][teamName];
+				if (checkTeam[dateIndex] === "A") {
+					amTeamJar.push({ division: teamDiv, team: teamName }); //JSON
+				}
+				if (checkTeam[dateIndex] === "P") {
+					pmTeamJar.push({ division: teamDiv, team: teamName });
+				}
+				if (checkTeam[dateIndex] === "N") {
+					onTeamJar.push({ division: teamDiv, team: teamName });
+				}
+			}
+			function checkEachTeamShift() {
+				inputToShiftArray("SS", "SS1", dateIndex);
+				inputToShiftArray("SS", "SS2", dateIndex);
+				inputToShiftArray("SS", "SS3", dateIndex);
+				inputToShiftArray("SS", "SS4", dateIndex);
+				inputToShiftArray("AP", "AP1", dateIndex);
+				inputToShiftArray("AP", "AP2", dateIndex);
+				inputToShiftArray("AP", "AP3", dateIndex);
+				inputToShiftArray("AP", "AP4", dateIndex);
+				inputToShiftArray("TT", "TT1", dateIndex);
+				inputToShiftArray("TT", "TT2", dateIndex);
+				inputToShiftArray("TT", "TT3", dateIndex);
+				inputToShiftArray("TT", "TT4", dateIndex);
+				inputToShiftArray("AC", "AC1", dateIndex);
+				inputToShiftArray("AC", "AC2", dateIndex);
+				inputToShiftArray("AC", "AC3", dateIndex);
+				inputToShiftArray("AC", "AC4", dateIndex);
+				inputToShiftArray("DO", "DO1", dateIndex);
+				inputToShiftArray("DO", "DO2", dateIndex);
+				inputToShiftArray("DO", "DO3", dateIndex);
+				inputToShiftArray("DO", "DO4", dateIndex);
+			}
+			checkEachTeamShift();
+
+			function handleFillInBox(teamJar, shift) {
+				for (let i = 0; i <= 2; i++) {
+					// ON SHIFT
+					if (shift === "ON") {
+						if (i === 0) {
+							onshiftTextareaContext =
+								onshiftTextareaContext + shift + " " + teamJar[i]["team"] + " ";
+						} else if (i === 2) {
+							onshiftTextareaContext =
+								onshiftTextareaContext + teamJar[i]["team"] + "\n";
+						} else {
+							onshiftTextareaContext =
+								onshiftTextareaContext + teamJar[i]["team"] + " ";
+						}
+					}
+					// ELSE
+					else {
+						if (i === 0) {
+							textareaContext =
+								textareaContext + shift + " " + teamJar[i]["team"] + " ";
+						} else if (i === 2) {
+							textareaContext = textareaContext + teamJar[i]["team"] + "\n";
+						} else {
+							textareaContext = textareaContext + teamJar[i]["team"] + " ";
+						}
+					}
+				}
+				for (let i = 3; i <= 4; i++) {
+					if (i === 3) {
+						otherTextareaContext =
+							otherTextareaContext + shift + " " + teamJar[i]["team"] + " ";
+					} else if (i === 4) {
+						otherTextareaContext = otherTextareaContext + teamJar[i]["team"] + "\n";
+					} else {
+						otherTextareaContext = otherTextareaContext + teamJar[i]["team"] + " ";
+					}
+				}
+			}
+
+			function fillInBox() {
+				textareaContext = "高台已開" + "\n";
+				onshiftTextareaContext = "";
+				otherTextareaContext = "";
+				handleFillInBox(amTeamJar, "AM");
+				handleFillInBox(pmTeamJar, "PM");
+				handleFillInBox(onTeamJar, "ON");
+				document.querySelector("#today-duty").innerHTML = textareaContext;
+				document.querySelector("#onshift-duty").innerHTML = onshiftTextareaContext;
+				document.querySelector("#today-other-duty").innerHTML = otherTextareaContext;
+			}
+			fillInBox();
+		}
+
+		function ClickToCopy() {
+			document.querySelector("#today-duty").onclick = () => {
+				document.querySelector("#today-duty").select();
+				// document.execCommand("copy");
+			};
+		}
+
+		document.addEventListener("DOMContentLoaded", ready);
+
+		function ready() {
+			// Today
+			let today = new Date();
+			let theDate =
+				today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+
+			document.querySelector("#dateOfToday").innerHTML = theDate; // tell you date of today
+
+			function datediff(d1, d2) {
+				// let millisecDiff = d2 - d1;
+				let dayDiff = Math.floor((d2 - d1) / 1000 / 60 / 60 / 24);
+				return dayDiff;
+			}
+
+			/* ------------------------------------
+		          //Change Time for testing schedule
+		          const dateAsk = new Date(2021, 3, 30);
+		          const date2 = dateAsk.getTime();
+		          document.querySelector("#dateChecking").innerHTML = dateAsk;
+		          ------------------------------------ */
+
+			/*  This is the schedule started on 8.3.2021 */
+
+			/* ------------------------------------ */
+			/* Never Change This */
+			const date1 = new Date(2021, 2, 8).getTime();
+			/* Never Change This */
+			/* ------------------------------------ */
+			let date2 = Date.now(); //initial = today
+			let dateIndex = datediff(date1, date2) % 8;
+			/* console.log(`Date diff = ${dateIndex}`); */
+
+			// If i change the date
+			document.querySelector("#btn-teamDateQ").addEventListener("click", () => {
+				console.log("2");
+				let date2 = new Date(document.querySelector("#teamDateQ").value);
+				let dateIndex = datediff(date1, date2) % 8;
+				scheduleCheck(dateIndex, teams);
+			});
+
+			scheduleCheck(dateIndex, teams);
+
+			ClickToCopy();
+		}
+	</script>
+</html>
